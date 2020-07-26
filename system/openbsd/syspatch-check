@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Report any outstanding binary patches as reported by syspatch(8).
+# Output goes to syslog.
+
+set -e
+
+PATH=/usr/bin:/usr/sbin
+
+
+CMD=$(basename $0)
+
+set -A PATCHES $(syspatch -c)
+num=${#PATCHES[*]}
+
+if [ $num -gt 0 ]; then
+	printf "available patches (%d): %s\n" "$num" "${PATCHES[*]}" | \
+		logger -t "$CMD"
+fi
