@@ -5,7 +5,7 @@
 
 set -e
 
-PATH=/usr/bin:/usr/sbin
+PATH=/bin:/usr/bin:/usr/sbin
 
 
 CMD=$(basename $0)
