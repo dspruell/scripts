@@ -17,4 +17,6 @@ if [ $num -gt 0 ]; then
 	msg="$num available patches: ${PATCHES[*]}"
 	echo "${msg}"
 	echo "${msg}" | logger -t "${CMD}"
+else
+	echo "None."
 fi
