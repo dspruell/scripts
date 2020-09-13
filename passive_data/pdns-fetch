@@ -14,7 +14,7 @@ show_usage()
 	cat <<-EOF
 	Fetch PDNS records and cache to disk.
 
-	USAGE: $(basename $0) [options] term [...]
+	USAGE: $(basename "$0") [options] term [...]
 	  -j: request JSON data
 	  -h: show help
 EOF
@@ -36,9 +36,10 @@ while getopts "jh" optchar; do
 	      FEXT="json"
 	      ;;
 	  h)  show_usage; exit 0  ;;
+	  *)  show_usage; exit 1  ;;
 	esac
 done
-shift $(($OPTIND - 1))
+shift $((OPTIND - 1))
 
 ITEMS="$@"
 
