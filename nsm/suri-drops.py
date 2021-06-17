@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Author: Darren Spruell (phatbuckett@gmail.com)
 #
@@ -10,6 +10,7 @@
 import re
 import sys
 import fileinput
+
 
 STATS_LOG = '/var/log/suricata/stats.log'
 TS_REGEX = re.compile(r'Date:\s+(?P<month>\d+)/(?P<day>\d+)/(?P<year>\d+) -- (?P<time>\S+)')
@@ -41,6 +42,7 @@ for tstamp in data.keys():
     pairs = zip(data[tstamp]['kernel_drops'],
                 data[tstamp]['kernel_packets'])
     for i in pairs:
-        print('{tstamp}\t{percent:.0f}%'.format(tstamp=tstamp,
-                                    percent=(float(i[0]) / float(i[1]) * 100)))
+        print('{tstamp}\t{percent:.0f}%'.format(
+              tstamp=tstamp,
+              percent=(float(i[0]) / float(i[1]) * 100)))
 
