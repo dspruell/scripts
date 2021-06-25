@@ -1,2 +1,2 @@
 # scripts
-Misc tooling and scripts
+Miscellaneous tooling and scripts.
