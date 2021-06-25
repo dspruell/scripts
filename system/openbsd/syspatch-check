@@ -1,12 +1,11 @@
 #!/bin/sh
 #
 # Report any outstanding binary patches as determined by syspatch(8).
-# Output goes to syslog and to standard output.
+# Output goes to to stdout; available patches also logged to syslog.
 
 set -e
 
 export PATH=/bin:/usr/bin:/usr/sbin
-
 
 CMD=$(basename $0)
 
@@ -14,7 +13,11 @@ set -A PATCHES $(syspatch -c)
 num=${#PATCHES[*]}
 
 if [ $num -gt 0 ]; then
-	msg="$num available patches: ${PATCHES[*]}"
+	case $num in
+		1)  suf="" ;;
+		*)  suf="es" ;;
+	esac
+	msg="$num available patch${suf}: ${PATCHES[*]}"
 	echo "${msg}"
 	echo "${msg}" | logger -t "${CMD}"
 else
