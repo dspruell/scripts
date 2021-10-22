@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
-# Copyright (c) 2020-2021 Darren Spruell <dspruell@sancho2k.net>
+# Copyright (c) 2021 Darren Spruell <dspruell@sancho2k.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -14,27 +14,12 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# Report any outstanding binary patches as determined by syspatch(8).
-# Output goes to to stdout; occurrences of outstanding patches also logged to
-# syslog for log monitoring, etc.
+# Wrapper around whois(1) to fork output to named/timestamped file on disk as
+# well as stdout.
+#
+# Bashisms! This probably requires a somewhat recent version of Bash (4.2+).
 
 set -e
 
-export PATH=/bin:/usr/bin:/usr/sbin
-
-CMD=$(basename $0)
-
-set -A PATCHES $(syspatch -c)
-num=${#PATCHES[*]}
-
-if [ $num -gt 0 ]; then
-	case $num in
-		1)  suf="" ;;
-		*)  suf="es" ;;
-	esac
-	msg="$num available patch${suf}: ${PATCHES[*]}"
-	echo "${msg}"
-	echo "${msg}" | logger -t "${CMD}"
-else
-	echo "None."
-fi
+args=($@)
+whois "$@" | tee whois."${args[*]: -1}".$(date "+%Y%m%d").txt

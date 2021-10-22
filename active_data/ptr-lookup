@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2020-2021 Darren Spruell <dspruell@sancho2k.net>
+# Copyright (c) 2007-2021 Darren Spruell <dspruell@sancho2k.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -14,27 +14,22 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# Report any outstanding binary patches as determined by syspatch(8).
-# Output goes to to stdout; occurrences of outstanding patches also logged to
-# syslog for log monitoring, etc.
+# Performs a lookup for a given IP address to resolve its reverse DNS
+# address.
+# Usage: send the script a list of IP addresses via stdin.
 
-set -e
+getptr()
+{
+    local ip="$1"
+    printf "%-17s" "$ip"
+    ptr=$(dig +short -x $ip)
+    if [ X"$ptr" = X"" ]; then
+        echo "No PTR"
+    else
+        echo "${ptr%%.}"
+    fi
+}
 
-export PATH=/bin:/usr/bin:/usr/sbin
-
-CMD=$(basename $0)
-
-set -A PATCHES $(syspatch -c)
-num=${#PATCHES[*]}
-
-if [ $num -gt 0 ]; then
-	case $num in
-		1)  suf="" ;;
-		*)  suf="es" ;;
-	esac
-	msg="$num available patch${suf}: ${PATCHES[*]}"
-	echo "${msg}"
-	echo "${msg}" | logger -t "${CMD}"
-else
-	echo "None."
-fi
+while read ip; do
+    getptr $ip
+done

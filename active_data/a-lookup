@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2020-2021 Darren Spruell <dspruell@sancho2k.net>
+# Copyright (c) 2007-2021 Darren Spruell <dspruell@sancho2k.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -14,27 +14,25 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# Report any outstanding binary patches as determined by syspatch(8).
-# Output goes to to stdout; occurrences of outstanding patches also logged to
-# syslog for log monitoring, etc.
+# Performs a lookup for a given FQDN to resolve its forward DNS IP address.
+# Usage: send the script a list of FQDNs via stdin.
 
-set -e
+geta()
+{
+    local fqdn="$1"
+    printf "%-35s" $1
+    response=$(dig +short $fqdn | egrep \
+        "[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}")
+    if [ X"$response" = X"" ]; then
+        echo " No IP resolution"
+    else
+        for address in $response; do
+            printf " %s" $address
+        done
+        printf "\n"
+    fi
+}
 
-export PATH=/bin:/usr/bin:/usr/sbin
-
-CMD=$(basename $0)
-
-set -A PATCHES $(syspatch -c)
-num=${#PATCHES[*]}
-
-if [ $num -gt 0 ]; then
-	case $num in
-		1)  suf="" ;;
-		*)  suf="es" ;;
-	esac
-	msg="$num available patch${suf}: ${PATCHES[*]}"
-	echo "${msg}"
-	echo "${msg}" | logger -t "${CMD}"
-else
-	echo "None."
-fi
+while read fqdn; do
+    geta ${fqdn%.}  # Trim off trailing . from FQDNs
+done
