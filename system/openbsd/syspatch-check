@@ -28,11 +28,12 @@ set -A PATCHES $(syspatch -c)
 num=${#PATCHES[*]}
 
 if [ $num -gt 0 ]; then
+	syschar="$(uname -rsm)"
 	case $num in
 		1)  suf="" ;;
 		*)  suf="es" ;;
 	esac
-	msg="$num available patch${suf}: ${PATCHES[*]}"
+	msg="${syschar}: ${num} available patch${suf}: ${PATCHES[*]}"
 	echo "${msg}"
 	echo "${msg}" | logger -t "${CMD}"
 else
