@@ -1,0 +1,13 @@
+# Local configuration file to run an instance of clamd under my
+# unprivileged user account.
+
+LocalSocket /home/luser/.clamd.sock
+LogFile /home/luser/analysis/clamd.log
+LogTime yes
+LogClean yes
+LogVerbose no
+
+ScanPDF yes
+DetectPUA yes
+ArchiveBlockEncrypted yes
+ArchiveBlockMax yes
