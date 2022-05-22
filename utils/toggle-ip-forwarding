@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -e -u
+
+KNOB="net.ipv4.ip_forward"
+VAL_OFF=0
+VAL_ON=1
+
+check_forwarding_enabled()
+{
+	val="$(/sbin/sysctl --value ${KNOB})"
+	case "$val" in
+	  0)  _stat=1 ;;
+	  1)  _stat=0 ;;
+	  *)  echo "Unrecognized sysctl value: $val" >&2; exit 1 ;;
+	esac
+
+	return "$_stat"
+}
+
+toggle_forwarding()
+{
+	if check_forwarding_enabled; then
+		/sbin/sysctl "${KNOB}"="$VAL_OFF"
+	else
+		/sbin/sysctl "${KNOB}"="$VAL_ON"
+	fi
+}
+
+if [ $# -ge 1 ]; then
+	case "$1" in
+	  "-c")  
+              if check_forwarding_enabled; then
+		echo "enabled"
+              else
+		echo "disabled"
+              fi
+              ;;
+	  *)  echo "USAGE: $(basename $0) [-c]" >&2; exit 1 ;;
+	esac
+else
+	toggle_forwarding
+fi
