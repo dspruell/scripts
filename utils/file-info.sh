@@ -50,3 +50,4 @@ do
 	c=$((c-1))
 	[ "$c" -gt 0 ] && echo
 done
+exit 0
