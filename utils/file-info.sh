@@ -18,7 +18,7 @@ get_digest()
 {
 	_d="$1"  # digest type
 	_f="$2"  # input file
-	openssl dgst -"${_d}" -hex "$f" | awk '{print $NF}'
+	openssl dgst -"${_d}" -hex "$_f" | awk '{print $NF}'
 }
 
 
