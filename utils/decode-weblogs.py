@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2014 Darren Spruell <phatbuckett@gmail.com>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+# Filter provided file through Unicode (e.g. \u003d), octal (e.g. \43) and URL
+# encoding (e.g. %20) unescape. Output lines spaced for easier inspection.
+
+import re
+from urllib.parse import unquote_plus
+from argparse import ArgumentParser, FileType
+
+
+# Match occurrences of Unicode and octal escaped values with arbitrary number
+# of preceding backslashes
+UNICODE_PAT = re.compile(r"(?:\\)+u[0-9a-fA-F]{4}")
+OCTAL_PAT = re.compile(r"(?:\\)+\d{2,3}")
+
+
+# Reduce multiple backslashes to single slash to form valid escapes
+def reduce_slashes(val):
+    return re.sub(r"\\+", r"\\", val)
+
+
+# Decode unicode to ascii
+def unirepl(match):
+    return reduce_slashes(match.group(0))
+
+
+# Decode octal to ascii
+def octrepl(match):
+    return reduce_slashes(match.group(0))
+
+
+def main():
+    # parse options
+    descr = "usage: %prog FILE"
+    parser = ArgumentParser(descr)
+    parser.add_argument("infile", type=FileType("r"), help="input file")
+    args = parser.parse_args()
+
+    lines = []
+    for line in args.infile:
+        # Handle unicode
+        line = re.sub(UNICODE_PAT, unirepl, line)
+        # Handle octal
+        line = re.sub(OCTAL_PAT, octrepl, line)
+        lines.append(line.rstrip("\n"))
+
+    print(unquote_plus("\n".join(lines)))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
