@@ -99,7 +99,7 @@ for conf in $CONFS; do
     nmcli connection import type openvpn file "$conf"
     nmcli connection modify "$conf_id" connection.autoconnect FALSE
     if [ -n "$NMCLI_MOD_USER" ]; then
-        nmcli connection modify "$conf_id" vpn.user-name "$NMCLI_MOD_USER"
+        nmcli connection modify "$conf_id" +vpn.data username="$NMCLI_MOD_USER"
     fi
     new_cnt=$((new_cnt+1))
 done
