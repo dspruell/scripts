@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 #
-# Transform list of FQDNs on standard input by sorting them according to
-# reverse host notation (a.example.com sorted/grouped first by 'com', then by
-# 'example', then by 'a').
+# Extract PDB paths from input PE file.
 #
-# Copyright (c) 2015 Darren Spruell <phatbuckett@gmail.com>
+# Copyright (c) 2017 Darren Spruell <phatbuckett@gmail.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -20,24 +18,21 @@
 
 from argparse import ArgumentParser, FileType
 
+import pefile
+
 
 def main():
-    descr = (
-        "Transform list of FQDNs on standard input by sorting them "
-        "according to reverse host notation."
-    )
+    descr = "Extract PDB paths from input PE file."
     parser = ArgumentParser(description=descr)
-    parser.add_argument(
-        "infile",
-        type=FileType("r"),
-        help="input file (use '-' for standard input)",
-    )
+    parser.add_argument("infile", type=FileType("rb"), help="input PE file")
     args = parser.parse_args()
 
-    reversed_fqdns = sorted(
-        [fqdn.strip().split(".")[::-1] for fqdn in args.infile]
-    )
-    print("\n".join([".".join(fqdn[::-1]) for fqdn in reversed_fqdns]))
+    pe = pefile.PE(args.infile.name)
+    if hasattr(pe, "DIRECTORY_ENTRY_DEBUG"):
+        for i in pe.DIRECTORY_ENTRY_DEBUG:
+            if hasattr(i.entry, "PdbFileName"):
+                print(i.entry.PdbFileName.decode("utf-8"))
+    args.infile.close()
 
 
 if __name__ == "__main__":
