@@ -10,9 +10,7 @@ use File::Basename;
 my $help;
 my $scriptname = basename($0);
 
-my $result = GetOptions (
-                         "h"  => \$help
-                        );
+my $result = GetOptions( "h" => \$help );
 
 show_help() if $help;
 
