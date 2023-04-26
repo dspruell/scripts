@@ -19,17 +19,15 @@
 import re
 from argparse import ArgumentParser, FileType
 
-BOUND_META = r"\b"
+BOUND_ASSERT = r"\b"
 YARA_TPL = "rule test {{strings: $s1 = /{expr}/ condition: all of them }}"
 
 
-def get_escaped_terms(terms, add_boundaries=False):
+def get_escaped_terms(terms):
     """Generate escaped variants of input terms."""
     for t in terms:
         t = t.strip()
         t = re.escape(t)
-        if add_boundaries:
-            t = f"{BOUND_META}{t}{BOUND_META}"
         yield t
 
 
@@ -54,10 +52,9 @@ def main():
 
     terms = args.infile.readlines()
 
-    kwargs = {}
-    kwargs["add_boundaries"] = args.add_boundaries
-
-    output = "|".join(get_escaped_terms(terms, **kwargs))
+    output = "|".join(get_escaped_terms(terms))
+    if args.add_boundaries:
+        output = f"{BOUND_ASSERT}({output}){BOUND_ASSERT}"
 
     if args.yara_re_str:
         output = YARA_TPL.format(expr=output)
