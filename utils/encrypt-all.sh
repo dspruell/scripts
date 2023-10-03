@@ -2,7 +2,7 @@
 #
 # Encrypt all input files to the default key using GnuPG.
 #
-# Copyright (c) 2022 Darren Spruell <phatbuckett@gmail.com>
+# Copyright (c) 2022-2023 Darren Spruell <phatbuckett@gmail.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,7 @@
 
 set -e -u
 
-PATH="/usr/local/bin:/usr/bin:/bin"
+PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 
 # Process each input parameter as a file by encrypting with GnuPG if it does
 # not have a GPG file extension.
