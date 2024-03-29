@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2023 Darren Spruell <phatbuckett@gmail.com>
+# Copyright (c) 2023-2024 Darren Spruell <phatbuckett@gmail.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -15,23 +15,25 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-# Call any installed YARA versions rooted under a given prefix in sequence,
-# enabling to test operations with multiple versions. The prefix may be passed
-# in using the YARA_ENGINES_ROOT environment variable.
+# Call any installed YARA versions rooted under a given directory in
+# sequence, enabling to test operations with multiple versions. The prefix
+# may be passed in using the YARA_ENGINES_ROOT environment variable, and
+# defaults to /opt/yara.
 
 set -u
 
 YARA_ENGINES_ROOT=${YARA_ENGINES_ROOT:-/opt/yara/}
 
-for ye in ${YARA_ENGINES_ROOT}/*; do
+for ye in "${YARA_ENGINES_ROOT}"/*; do
 	[ -d "$ye" ] || continue
+	[ X"$ye" = X"$YARA_ENGINES_ROOT/cache" ] && continue
 	if [ ! -x "${ye}/bin/yara" ]; then
 		echo "[ERROR] ${ye} does not appear to be the prefix for a YARA installation (no bin/yara found)." >&2
 		continue
 	fi
 	VER="${ye##*/yara-}"
 	printf "***** %-30s *****\n" "YARA v${VER} begin..."
-	"${ye}"/bin/yara "$@"
+	"${ye}/bin/yara" "$@"
 	printf "***** %-30s *****\n" "YARA v${VER} exit status: $?"
 	echo
 done
