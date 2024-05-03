@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2007-2021 Darren Spruell <dspruell@sancho2k.net>
+# Copyright (c) 2007-2024 Darren Spruell <phatbuckett@gmail.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -14,22 +14,18 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# Performs a lookup for a given IP address to resolve its reverse DNS
-# address.
-# Usage: send the script a list of IP addresses via stdin.
+# Return reverse DNS records for input IP addresses.
+#
+# Usage: send the script a list of IP addresses (one per line) via stdin.
 
 getptr()
 {
-    local ip="$1"
-    printf "%-17s" "$ip"
-    ptr=$(dig +short -x $ip)
-    if [ X"$ptr" = X"" ]; then
-        echo "No PTR"
-    else
-        echo "${ptr%%.}"
-    fi
+	ip="$1"
+	ret="$(dig @8.8.8.8 +short -x "$ip")"
+	echo "${ret:-No PTR}"
 }
 
-while read ip; do
-    getptr $ip
+while read -r addr; do
+	ptr="$(getptr "$addr")"
+	printf "%-17s %s\n" "$addr" "${ptr%.}"
 done
