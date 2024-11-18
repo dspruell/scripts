@@ -24,8 +24,9 @@ EOF
 items2str()
 {
 	# Use a tag for the filename that removes spaces and limits longer
-	# argument lists to maximum number of characters.
-	printf "%s" "$*" | tr ' ' '-' | cut -c1-40
+	# argument lists to maximum number of characters. Convert any wildcard
+	# domain asterisks to an alphabetic string.
+	printf "%s" "$*" | tr ' ' '-' | sed 's!\*!WILDCARD!g' | cut -c1-40
 }
 
 
