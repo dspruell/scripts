@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2023-2024 Darren Spruell <phatbuckett@gmail.com>
+# Copyright (c) 2023-2025 Darren Spruell <phatbuckett@gmail.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -37,3 +37,12 @@ for ye in "${YARA_ENGINES_ROOT}"/*; do
 	printf "***** %-30s *****\n" "YARA v${VER} exit status: $?"
 	echo
 done
+
+# Additionally call any installed "system" YARA, for example a default version
+# installed from a package repository.
+VER="$(yara --version 2>/dev/null)"
+if [ $? -eq 0 ]; then
+	printf "***** %-30s *****\n" "YARA v${VER} (system) begin..."
+	yara "$@"
+	printf "***** %-30s *****\n" "YARA v${VER} exit status: $?"
+fi
