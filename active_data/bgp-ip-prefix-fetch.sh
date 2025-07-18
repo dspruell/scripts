@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Use the bgpq4 tool to retrieve prefix data for a given ASN.
+# Wrapper script to use the bgpq4 tool to retrieve prefix data for a given ASN.
 
 set -e
 
@@ -11,16 +11,20 @@ usage()
 {
     cat <<-EOF
 	USAGE: $progname [options]
+	  -6: retrieve IPv6 prefixes
 	  -a: trust all sources output by the queried data source
+	  -b: prefix output lines with hyphens (bulleted list)
 	  -h: display this help output
 EOF
 }
 
 # Parse script arguments
-while getopts "ah" optchar
+while getopts "6abh" optchar
 do
     case $optchar in
+        6)  FETCH_IPV6=1   ;;
         a)  TRUST_ALL=1    ;;
+        b)  BULLETS=1      ;;
         h)  usage; exit 0  ;;
         *)  usage; exit 1  ;;
     esac
@@ -36,9 +40,8 @@ then
 	usage; exit 1
 fi
 
-if [ -z "$TRUST_ALL" ]
-then
-	OPTS="$OPTS -S RPKI,AFRINIC,APNIC,ARIN,LACNIC,RIPE"
-fi
+[ -n "$TRUST_ALL" ] || OPTS="$OPTS -S RPKI,AFRINIC,APNIC,ARIN,LACNIC,RIPE"
+[ -n "$FETCH_IPV6" ] && OPTS="$OPTS -6"
 
-bgpq4 -F "%n/%l\n" "$AS"
+# shellcheck disable=SC2086
+bgpq4 -F "${BULLETS:+- }%n/%l\n" ${OPTS} "$AS"
