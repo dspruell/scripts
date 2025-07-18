@@ -10,11 +10,13 @@ OPTS=""
 usage()
 {
     cat <<-EOF
-	USAGE: $progname [options]
+	USAGE: $progname [options] <AS>
 	  -6: retrieve IPv6 prefixes
 	  -a: trust all sources output by the queried data source
 	  -b: prefix output lines with hyphens (bulleted list)
 	  -h: display this help output
+
+	An AS parameter must be specified (e.g., AS15169)
 EOF
 }
 
