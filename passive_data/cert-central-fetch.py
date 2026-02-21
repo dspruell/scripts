@@ -14,34 +14,19 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# Query ja3er.com for data related to input JA3 hash.
-#
-# https://ja3er.com/
+# Download the Cert Central dataset.
 
-from argparse import ArgumentParser
-import requests
-
-API_URL = "https://ja3er.com/search"
+import urllib.request
+from datetime import datetime
 
 
-def main():
-    "Query for input JA3 hash and output list of returned User-Agent values"
+CSV_DATA = "https://certcentral.org/api/download_csv"
 
-    parser = ArgumentParser()
-    parser.add_argument("hash", help="JA3/JA3S hash")
-    args = parser.parse_args()
+today = datetime.now().strftime("%Y%m%d")
+out_file = f"cert-central-{today}.csv"
 
-    url = f"{API_URL}/{args.hash}"
-    r = requests.get(url)
-    j = r.json()
+with urllib.request.urlopen(CSV_DATA) as response:
+    with open(out_file, "wb") as f:
+        f.write(response.read())
 
-    for d in j:
-        if "User-Agent" in d:
-            print(d["User-Agent"])
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        pass
+print("Done:", out_file)

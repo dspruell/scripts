@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/bin/sh
 
 # Copyright (c) 2026 Darren Spruell <phatbuckett@gmail.com>
 #
@@ -14,34 +14,18 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# Query ja3er.com for data related to input JA3 hash.
-#
-# https://ja3er.com/
+# Add file to a new encrypted ZIP archive named based on the file's SHA256
+# hash. Use the de facto standard key for suspicious files.
 
-from argparse import ArgumentParser
-import requests
+set -e -u
 
-API_URL = "https://ja3er.com/search"
+INFILE="$1"
+ENC_KEY="infected"
 
+get_hash_prefix()
+{
+	_file="$1"
+	openssl sha256 "${_file}" | awk '{print $NF}' | cut -c 1-9
+}
 
-def main():
-    "Query for input JA3 hash and output list of returned User-Agent values"
-
-    parser = ArgumentParser()
-    parser.add_argument("hash", help="JA3/JA3S hash")
-    args = parser.parse_args()
-
-    url = f"{API_URL}/{args.hash}"
-    r = requests.get(url)
-    j = r.json()
-
-    for d in j:
-        if "User-Agent" in d:
-            print(d["User-Agent"])
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        pass
+zip -P${ENC_KEY} "$(get_hash_prefix "${INFILE}").zip" "${INFILE}"
