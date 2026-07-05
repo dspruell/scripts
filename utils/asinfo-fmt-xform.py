@@ -41,6 +41,7 @@ def main():
     parser.add_argument(
         "infile",
         nargs="?",
+        default="-",
         type=FileType(),
         help="input file or stream (default: stdin)",
     )
